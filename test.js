@@ -6,7 +6,7 @@ describe('source',function(){it('should load',function(){J=require('./');});});
 
 var opts = {cellNF:true};
 if(process.env.WTF) opts.WTF = true;
-var ex = [".xls",".xml",".xlsx",".xlsm",".xlsb"];
+var ex = [".xls",".xml",".xlsx",".xlsm",".xlsb",".csv",".slk",".dif",".txt"];
 if(process.env.FMTS) ex=process.env.FMTS.split(":").map(function(x){return x[0]==="."?x:"."+x;});
 var exp = ex.map(function(x){ return x + ".pending"; });
 function test_file(x) {	return ex.indexOf(x.substr(-4))>=0 || ex.indexOf(x.substr(-5))>=0 || exp.indexOf(x.substr(-12))>=0 || exp.indexOf(x.substr(-13))>=0; }
@@ -14,6 +14,8 @@ function test_file(x) {	return ex.indexOf(x.substr(-4))>=0 || ex.indexOf(x.subst
 var files = (fs.existsSync('tests.lst') ? fs.readFileSync('tests.lst', 'utf-8').split("\n") : fs.readdirSync('test_files')).filter(test_file);
 
 var dir = "./test_files/";
+
+before(function(){if(!fs.existsSync(dir))throw new Error(dir + " missing");});
 
 files.forEach(function(x) {
 	if(fs.existsSync(dir + x.replace(/\.(pending|nowrite)/, ""))) describe(x.replace(/\.pending/,""), function() {
@@ -29,6 +31,7 @@ files.forEach(function(x) {
 			J.utils.to_html(wb);
 			J.utils.to_html_cols(wb);
 			J.utils.to_md(wb);
+			J.utils.to_socialcalc(wb);
 			J.utils.to_xml(wb);
 		});
 		it('should round-trip XLSX', x.substr(-8) == ".pending" || x.substr(-8) == ".nowrite" ? null : function() {
